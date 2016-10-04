@@ -9,10 +9,12 @@
                 $post = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
                 $database -> query('SELECT * FROM posts');
                 $rows = $database->resultset();
-//
-//            $Tags = new Tags();
-//            $Tags->query('SELECT * FROM posts');
-//            $rows = $Tags->resultset();
+            if(@$_POST['delete_id']){
+                $delete_id = $_POST['delete_id'];
+                $database->query('DELETE FROM posts WHERE id = :id');
+                $database->bind(':id', $delete_id);
+                $database->execute();
+            }
 
             ?>
             <title>Gaming Blog</title>
@@ -50,6 +52,12 @@
                             <h2><?php echo $row['title']; ?></h2>
 
                             <p><?php echo $row['post']; ?></p>
+                            <p><?php
+                                $database -> query('SELECT * FROM tags');
+                                $rowed = $database->resultset();
+                                foreach($rowed as $roweds) {
+                                    echo $roweds['tag'] ;
+                                }?></p>
                         </article>
                     </div>
 
@@ -58,6 +66,10 @@
                         <div class="card__author">
                             <div class="card__author-content">
                                  <p>By: <?php echo $row['authors']; ?></p>
+                                <form style="align-content: right;" method="post" action="<?php $_SERVER['PHP_SELF']; ?>">
+                                    <input type="hidden" name="delete_id" value="<?php echo $row['id']; ?>">
+                                    <input type="submit"  class="btn btn-default btn-sm" name="delete" placeholder="Delete" value="Delete">
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -66,6 +78,7 @@
             </div>
             <?php
         }
+
            ?>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
         <nav class="navbar navbar-inverse navbar-fixed-bottom">

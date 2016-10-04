@@ -15,25 +15,36 @@
         $database->bind(':tag_search', $tag);
         $database->execute();
     }
-    if(@$_POST['delete_id']){
-        $delete_id = $_POST['delete_id'];
-        $database->query('DELETE FROM posts WHERE id = :id');
-        $database->bind(':id', $delete_id);
-        $database->execute();
-    }
 
     if (@$_POST['submit']) {
         $title = $post['title'];
         $post = $post['post'];
         $author = $_POST['author'];
-        $database->query('INSERT INTO posts (post, title, authors) VALUES(:post, :title, :author)');
-        $database->bind(':title', $title);
-        $database->bind(':post', $post);
-        $database->bind(':author', $author);
-        $database->execute();
-        if ($database->lastInsertId()) {
-            $message = $title . ' was added';
-            echo "<script>alert($message);</script>";
+        if (!empty($title) && !empty($post) && !empty($author)) {
+            $database->query('INSERT INTO posts (post, title, authors) VALUES(:post, :title, :author)');
+            $database->bind(':title', $title);
+            $database->bind(':post', $post);
+            $database->bind(':author', $author);
+            $database->execute();
+            if ($database->lastInsertId()) {
+                $message = $title . ' was added';
+                echo "<script> var alert = alert($message);</script>";
+                $tag = $_POST['tags'];
+                $database->query('INSERT INTO tags (tag) VALUES (:tags)');
+                $database->bind(':tags', $tag);
+                $database->execute();
+//                if($database->lastInsertId()){
+//                    $post_id = $_POST['post_id'];
+//                    $tag_id = $_POST['tag_id'];
+//                    $database->query('INSERT INTO post_tags (posts_id, tags_id) VALUES (:post_id, tag_id)');
+//                    $database->bind(':post_id', $post_id);
+//                    $database->bind(':tag_id', $tag_id);
+//                    $database->execute();
+//                }
+            }
+        }
+        else{
+            echo '<p>Please fill in the blank information</p>';
         }
     }
     //
@@ -50,6 +61,24 @@
     <!--Stylesheet link -->
     <link rel="stylesheet" href="styles.css" type="text/css">
 </head>
+<style>
+    [type="submit"] {
+        font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+        width: 100%;
+        background:#CC6666;
+        border-radius:5px;
+        border:0;
+        cursor:pointer;
+        color:white;
+        font-size:24px;
+        padding-top:10px;
+        padding-bottom:10px;
+        transition: all 0.3s;
+        margin-top:-4px;
+        font-weight:700;
+    }
+    [type="submit"]:hover { background:#CC4949; }
+</style>
 <body>
 <nav class="navbar navbar-inverse">
     <ul class="nav navbar-nav navbar-left">
@@ -72,6 +101,10 @@
         <div class="form-group">
             <label for="post">Post: </label>
             <textarea class="feedback-input" rows="4" name="post" placeholder="Post..."></textarea>
+        </div>
+        <div class="form-group">
+            <label for="tag">Tag: </label>
+            <input class="feedback-input" name="tags" placeholder="Tag #">
         </div>
         <input type="submit" name="submit">
     </form>
