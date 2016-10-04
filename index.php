@@ -38,7 +38,7 @@
         foreach($rows as $row) {
 
             $datetime = strtotime($row['dates']);
-            $mysqldate = date("M-d-y", $datetime);
+            $mysqldate = date("M-d-y     H:m:s", $datetime);
             ?>
             <div class="wrapper">
 
